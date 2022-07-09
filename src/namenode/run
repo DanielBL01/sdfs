@@ -1,0 +1,2 @@
+#/bin/zsh
+FLASK_APP=namenode.py flask run

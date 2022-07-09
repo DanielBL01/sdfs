@@ -1,0 +1,3 @@
+#/bin/zsh
+python -m pip install -r datanode/requirements.txt
+python -m pip install -r namenode/requirements.txt

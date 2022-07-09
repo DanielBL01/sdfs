@@ -1,0 +1,4 @@
+#/bin/zsh
+curl -X POST http://127.0.0.1:5000/ -d '{"name": "test_one.txt", "path": "/Users/daniellee/workplace/sdfs/src/test_files/test_one.txt"}' -H 'Content-Type: application/json'
+
+curl -X GET http://127.0.0.1:5000/ -d '{"name": "test_one.txt"}' -H 'Content-Type: application/json'

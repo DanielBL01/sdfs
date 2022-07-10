@@ -2,25 +2,32 @@
 
 gRPC Server Code for DataNode
 
+The gRPC DataNode Servers will be multiprocessing based servers which
+will detect number of cores in a machine and spin up instances
+
 """
 
-from concurrent import futures
+from datetime import timedelta
+import time
 import os
+from concurrent import futures
+import multiprocessing
 
 import grpc
 from datanode_pb2 import File, Response
 import datanode_pb2_grpc
 
+_ONE_DAY = timedelta(days=1)
+_PROCESS_COUNT = multiprocessing.cpu_count()
+""" For now, limit the of DataNode processes to three """
+if _PROCESS_COUNT > 4:
+    _PROCESS_COUNT = 3
+_THREAD_CONCURRENCY = _PROCESS_COUNT
+
 parent_dir = "/Users/daniellee/.sdfs/"
 datanode_dir = parent_dir + "datanode/"
 
-def _handle_dirs():
-    if not os.path.isdir(datanode_dir):
-        os.makedirs(datanode_dir)
-    else:
-        print("{} exists".format(datanode_dir))
-
-class DataNodeServicer(datanode_pb2_grpc.DataNodeServicer):
+class _DataNodeServicer(datanode_pb2_grpc.DataNodeServicer):
 
     def NameNodeWrite(self, request, context):
         filename = request.filename
@@ -39,14 +46,46 @@ class DataNodeServicer(datanode_pb2_grpc.DataNodeServicer):
             system_binary_file_content = system_binary_file.read()
             return File(content = system_binary_file_content) 
 
+def _handle_dirs():
+    if not os.path.isdir(datanode_dir):
+        os.makedirs(datanode_dir)
+    else:
+        print("{} exists".format(datanode_dir))
+
+def _wait_forever(server):
+    try:
+        while True:
+            time.sleep(_ONE_DAY.seconds())
+    except KeyboardInterrupt:
+        server.stop(None)
+
+def _run_server(bind_address):
+    """ Start a server in a subprocess """
+    options = (("grpc.so_reuseport", 1),)
+    server = grpc.server(futures.ThreadPoolExecutor(
+        max_workers=_THREAD_CONCURRENCY,),
+        options=options
+    )
+    datanode_pb2_grpc.add_DataNodeServicer_to_server(
+        _DataNodeServicer(),
+        server)
+    server.add_insecure_port(bind_address)
+    server.start()
+    _wait_forever(server)
+
 def serve():
     _handle_dirs()
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    datanode_pb2_grpc.add_DataNodeServicer_to_server(DataNodeServicer(), server)
-    """ Currently just run the DataNode server on 8080 as default """
-    server.add_insecure_port("[::]:8080")
-    server.start()
-    server.wait_for_termination()
-
+    bind_address = "[::]:8080"
+    workers = []
+    for _ in range(_PROCESS_COUNT):
+        worker = multiprocessing.Process(
+            target=_run_server,
+            args=(bind_address,)
+        )
+        worker.start()
+        workers.append(worker)
+    for worker in workers:
+        worker.join()
+ 
 if __name__ == "__main__":
     serve()

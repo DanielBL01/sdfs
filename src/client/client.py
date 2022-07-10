@@ -35,14 +35,17 @@ app = Flask(__name__)
 
 parent_dir = "/Users/daniellee/.sdfs/"
 host = os.getenv("HOST", "localhost")
-namenode_channel = grpc.insecure_channel(f"{host}:9000")
-datanode_channel = grpc.insecure_channel(f"{host}:8080")
-""" A stub exists to call service defined in .proto """
-namenode_stub = namenode_pb2_grpc.NameNodeStub(namenode_channel) 
-datanode_stub = datanode_pb2_grpc.DataNodeStub(datanode_channel)
 
 @app.route("/", methods=["GET", "POST"])
 def handle():
+	""" Each method will create an instance of a channel and close """
+	namenode_channel = grpc.insecure_channel(f"{host}:9000")
+	datanode_channel = grpc.insecure_channel(f"{host}:8080")
+	""" A stub exists to call service defined in .proto """
+	namenode_stub = namenode_pb2_grpc.NameNodeStub(namenode_channel)
+	datanode_stub = datanode_pb2_grpc.DataNodeStub(datanode_channel)
+
+	""" Accept application/json in curl requests """
 	if request.method == "POST":
 		filename = request.get_json()["name"]
 		sourcepath = request.get_json()["path"] 
@@ -57,6 +60,9 @@ def handle():
 		read_request = datanode_pb2.SystemFile(filename = filename)
 		print(datanode_stub.ClientReadFromDataNode(read_request))
 		return "get success\n"
+
+	namenode_channel.close()
+	datanode_channel.close()
 
 if __name__ == "__main__":
 	app.run(debug=True)

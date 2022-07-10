@@ -14,13 +14,21 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x64\x61tanode.proto\x12\x11\x64\x61tanode.datanode\"\x1e\n\nSystemFile\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\"\x17\n\x04\x46ile\x12\x0f\n\x07\x63ontent\x18\x01 \x01(\x0c\"\x1b\n\x08Response\x12\x0f\n\x07message\x18\x01 \x01(\t2\xad\x01\n\x08\x44\x61taNode\x12M\n\rNameNodeWrite\x12\x1d.datanode.datanode.SystemFile\x1a\x1b.datanode.datanode.Response\"\x00\x12R\n\x16\x43lientReadFromDataNode\x12\x1d.datanode.datanode.SystemFile\x1a\x17.datanode.datanode.File\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x64\x61tanode.proto\x12\x11\x64\x61tanode.datanode\"3\n\x0eSystemFileData\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\x0c\"\x1e\n\nSystemFile\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\"\x17\n\x04\x46ile\x12\x0f\n\x07\x63ontent\x18\x01 \x01(\x0c\"\x1b\n\x08Response\x12\x0f\n\x07message\x18\x01 \x01(\t2\xb1\x01\n\x08\x44\x61taNode\x12Q\n\rNameNodeWrite\x12!.datanode.datanode.SystemFileData\x1a\x1b.datanode.datanode.Response\"\x00\x12R\n\x16\x43lientReadFromDataNode\x12\x1d.datanode.datanode.SystemFile\x1a\x17.datanode.datanode.File\"\x00\x62\x06proto3')
 
 
 
+_SYSTEMFILEDATA = DESCRIPTOR.message_types_by_name['SystemFileData']
 _SYSTEMFILE = DESCRIPTOR.message_types_by_name['SystemFile']
 _FILE = DESCRIPTOR.message_types_by_name['File']
 _RESPONSE = DESCRIPTOR.message_types_by_name['Response']
+SystemFileData = _reflection.GeneratedProtocolMessageType('SystemFileData', (_message.Message,), {
+  'DESCRIPTOR' : _SYSTEMFILEDATA,
+  '__module__' : 'datanode_pb2'
+  # @@protoc_insertion_point(class_scope:datanode.datanode.SystemFileData)
+  })
+_sym_db.RegisterMessage(SystemFileData)
+
 SystemFile = _reflection.GeneratedProtocolMessageType('SystemFile', (_message.Message,), {
   'DESCRIPTOR' : _SYSTEMFILE,
   '__module__' : 'datanode_pb2'
@@ -46,12 +54,14 @@ _DATANODE = DESCRIPTOR.services_by_name['DataNode']
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _SYSTEMFILE._serialized_start=37
-  _SYSTEMFILE._serialized_end=67
-  _FILE._serialized_start=69
-  _FILE._serialized_end=92
-  _RESPONSE._serialized_start=94
-  _RESPONSE._serialized_end=121
-  _DATANODE._serialized_start=124
-  _DATANODE._serialized_end=297
+  _SYSTEMFILEDATA._serialized_start=37
+  _SYSTEMFILEDATA._serialized_end=88
+  _SYSTEMFILE._serialized_start=90
+  _SYSTEMFILE._serialized_end=120
+  _FILE._serialized_start=122
+  _FILE._serialized_end=145
+  _RESPONSE._serialized_start=147
+  _RESPONSE._serialized_end=174
+  _DATANODE._serialized_start=177
+  _DATANODE._serialized_end=354
 # @@protoc_insertion_point(module_scope)

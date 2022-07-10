@@ -12,10 +12,15 @@ package datanode.datanode;
 service DataNode {
 
     // NOTE: DataNode is not client facing, this write only happens from NameNode
-    rpc NameNodeWrite(SystemFile) returns (Response) {}
+    rpc NameNodeWrite(SystemFileData) returns (Response) {}
 
     // Client reads from DataNode
     rpc ClientReadFromDataNode(SystemFile) returns (File) {} 
+}
+
+message SystemFileData {
+    string filename = 1;
+    bytes content = 2;
 }
 
 message SystemFile {

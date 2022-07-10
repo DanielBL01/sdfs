@@ -16,7 +16,7 @@ class DataNodeStub(object):
         """
         self.NameNodeWrite = channel.unary_unary(
                 '/datanode.datanode.DataNode/NameNodeWrite',
-                request_serializer=datanode__pb2.SystemFile.SerializeToString,
+                request_serializer=datanode__pb2.SystemFileData.SerializeToString,
                 response_deserializer=datanode__pb2.Response.FromString,
                 )
         self.ClientReadFromDataNode = channel.unary_unary(
@@ -48,7 +48,7 @@ def add_DataNodeServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'NameNodeWrite': grpc.unary_unary_rpc_method_handler(
                     servicer.NameNodeWrite,
-                    request_deserializer=datanode__pb2.SystemFile.FromString,
+                    request_deserializer=datanode__pb2.SystemFileData.FromString,
                     response_serializer=datanode__pb2.Response.SerializeToString,
             ),
             'ClientReadFromDataNode': grpc.unary_unary_rpc_method_handler(
@@ -78,7 +78,7 @@ class DataNode(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/datanode.datanode.DataNode/NameNodeWrite',
-            datanode__pb2.SystemFile.SerializeToString,
+            datanode__pb2.SystemFileData.SerializeToString,
             datanode__pb2.Response.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

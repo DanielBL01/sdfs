@@ -23,10 +23,16 @@ def _handle_dirs():
 class DataNodeServicer(datanode_pb2_grpc.DataNodeServicer):
 
     def NameNodeWrite(self, request, context):
-        return Response()
+        filename = request.filename
+        content = request.content
+        system_file_path = datanode_dir + filename
+        with open(system_file_path, "wb") as system_binary_file:
+            system_binary_file.write(content)
+            system_binary_file.close()
+        return Response(message = "Successfully replicated to DataNode")
 
     def ClientReadFromDataNode(self, request, context):
-        """ Read rpc is given a SystemFile message and returns File message """ 
+        """ Read rpc gets a SystemFile message and returns File message """
         filename = request.filename
         system_file_path = datanode_dir + filename
         with open(system_file_path, "rb") as system_binary_file:

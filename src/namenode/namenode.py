@@ -58,6 +58,7 @@ def serve():
     _handle_dirs()
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     namenode_pb2_grpc.add_NameNodeServicer_to_server(NameNodeServicer(), server)
+    """ Currently just run the NameNode server on 9000 as default """
     server.add_insecure_port("[::]:9000")
     server.start()
     server.wait_for_termination()

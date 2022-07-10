@@ -11,4 +11,4 @@
 - Spliting files into chunks to handle large files
 
 ### Project Architecture
-<img width="318" alt="Screen Shot 2022-07-09 at 3 02 39 AM" src="https://user-images.githubusercontent.com/58889021/178095557-89d3cf00-98f4-49e9-bea1-faf51947e6c7.png">
+<img width="394" alt="Screen Shot 2022-07-09 at 11 08 00 PM" src="https://user-images.githubusercontent.com/58889021/178129703-06e5e0a1-a9f3-4ec1-9d16-60a192f67305.png">

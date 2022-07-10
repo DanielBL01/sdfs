@@ -2,16 +2,19 @@
 
 gRPC Server Code for DataNode
 
-The gRPC DataNode Servers will be multiprocessing based servers which
-will detect number of cores in a machine and spin up instances
+The gRPC DataNode Servers will be multiprocessing based servers where
+we instantiate one server per subprocess, balancing requests between
+the servers using the SO_REUSEPORT socket option 
 
 """
 
+import contextlib
 from datetime import timedelta
 import time
 import os
 from concurrent import futures
 import multiprocessing
+import socket
 
 import grpc
 from datanode_pb2 import File, Response
@@ -73,19 +76,33 @@ def _run_server(bind_address):
     server.start()
     _wait_forever(server)
 
+@contextlib.contextmanager
+def _reserve_port():
+    """ Find and reserve a port for all subprocesses to use """
+    sock = socket.socket(socket.AF_INTET6, socket.SOCK_STREAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+    if sock.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT) == 0:
+        raise RuntimeError("Failed to set SO_REUSEPORT")
+    sock.bind(("", 0))
+    try:
+        yield sock.getsockname()[1]
+    finally:
+        sock.close()
+
 def serve():
     _handle_dirs()
-    bind_address = "[::]:8080"
-    workers = []
-    for _ in range(_PROCESS_COUNT):
-        worker = multiprocessing.Process(
-            target=_run_server,
-            args=(bind_address,)
-        )
-        worker.start()
-        workers.append(worker)
-    for worker in workers:
-        worker.join()
+    with _reserve_port() as port:
+        bind_address = "[::]:8080"
+        workers = []
+        for _ in range(_PROCESS_COUNT):
+            worker = multiprocessing.Process(
+                target=_run_server,
+                args=(bind_address,)
+            )
+            worker.start()
+            workers.append(worker)
+        for worker in workers:
+            worker.join()
  
 if __name__ == "__main__":
     serve()

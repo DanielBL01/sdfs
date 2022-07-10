@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+/*
+
+The NameNode service or microservice should be the client-facing service for all writes to
+the filesystem. This this project will implement leader-based replication, this distributed
+file system should theoretically scale well for reads. 
+
+*/
+
+package namenode.namenode;
+
+service NameNode {
+
+    /*
+    
+    Simple RPC where client sends a request to server using stub and waits for a response 
+    A stub exists to call service defined in .proto
+
+    */
+
+    // Client writes to NameNode
+    rpc ClientWrite(SourceFile) returns (Response) {}
+
+    // Client reads from NameNode
+    rpc ClientReadFromNameNode(SystemFile) returns (File) {}
+}
+
+message SourceFile {
+    string filename = 1;
+    string sourcepath = 2;
+}
+
+message SystemFile {
+    string filename = 1;
+}
+
+message File {
+    bytes content = 1;
+}
+
+message Response {
+    string message = 1;
+}

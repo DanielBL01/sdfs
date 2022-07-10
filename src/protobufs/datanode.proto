@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+/*
+
+The DataNode service or microservice should never be exposed to writes and only reads, where
+the client can read from ANY nodes including the NameNode and DataNodes.
+
+*/
+
+package datanode.datanode;
+
+service DataNode {
+
+    // NOTE: DataNode is not client facing, this write only happens from NameNode
+    rpc NameNodeWrite(SystemFile) returns (Response) {}
+
+    // Client reads from DataNode
+    rpc ClientReadFromDataNode(SystemFile) returns (File) {} 
+}
+
+message SystemFile {
+    string filename = 1;
+}
+
+message File {
+    bytes content = 1;
+}
+
+message Response {
+    string message = 1;
+}

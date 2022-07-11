@@ -15,12 +15,12 @@ class NameNodeStub(object):
             channel: A grpc.Channel.
         """
         self.ClientWrite = channel.unary_unary(
-                '/namenode.namenode.NameNode/ClientWrite',
+                '/proto3.namenode.NameNode/ClientWrite',
                 request_serializer=namenode__pb2.SourceFile.SerializeToString,
                 response_deserializer=namenode__pb2.Response.FromString,
                 )
         self.ClientReadFromNameNode = channel.unary_unary(
-                '/namenode.namenode.NameNode/ClientReadFromNameNode',
+                '/proto3.namenode.NameNode/ClientReadFromNameNode',
                 request_serializer=namenode__pb2.SystemFile.SerializeToString,
                 response_deserializer=namenode__pb2.File.FromString,
                 )
@@ -64,7 +64,7 @@ def add_NameNodeServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'namenode.namenode.NameNode', rpc_method_handlers)
+            'proto3.namenode.NameNode', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -83,7 +83,7 @@ class NameNode(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/namenode.namenode.NameNode/ClientWrite',
+        return grpc.experimental.unary_unary(request, target, '/proto3.namenode.NameNode/ClientWrite',
             namenode__pb2.SourceFile.SerializeToString,
             namenode__pb2.Response.FromString,
             options, channel_credentials,
@@ -100,7 +100,7 @@ class NameNode(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/namenode.namenode.NameNode/ClientReadFromNameNode',
+        return grpc.experimental.unary_unary(request, target, '/proto3.namenode.NameNode/ClientReadFromNameNode',
             namenode__pb2.SystemFile.SerializeToString,
             namenode__pb2.File.FromString,
             options, channel_credentials,

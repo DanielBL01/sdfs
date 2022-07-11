@@ -7,7 +7,7 @@ the client can read from ANY nodes including the NameNode and DataNodes.
 
 */
 
-package datanode.datanode;
+package proto3.datanode;
 
 service DataNode {
 

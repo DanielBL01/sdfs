@@ -8,7 +8,7 @@ file system should theoretically scale well for reads.
 
 */
 
-package namenode.namenode;
+package proto3.namenode;
 
 service NameNode {
 

@@ -15,12 +15,12 @@ class DataNodeStub(object):
             channel: A grpc.Channel.
         """
         self.NameNodeWrite = channel.unary_unary(
-                '/datanode.datanode.DataNode/NameNodeWrite',
+                '/proto3.datanode.DataNode/NameNodeWrite',
                 request_serializer=datanode__pb2.SystemFileData.SerializeToString,
                 response_deserializer=datanode__pb2.Response.FromString,
                 )
         self.ClientReadFromDataNode = channel.unary_unary(
-                '/datanode.datanode.DataNode/ClientReadFromDataNode',
+                '/proto3.datanode.DataNode/ClientReadFromDataNode',
                 request_serializer=datanode__pb2.SystemFile.SerializeToString,
                 response_deserializer=datanode__pb2.File.FromString,
                 )
@@ -58,7 +58,7 @@ def add_DataNodeServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'datanode.datanode.DataNode', rpc_method_handlers)
+            'proto3.datanode.DataNode', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -77,7 +77,7 @@ class DataNode(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/datanode.datanode.DataNode/NameNodeWrite',
+        return grpc.experimental.unary_unary(request, target, '/proto3.datanode.DataNode/NameNodeWrite',
             datanode__pb2.SystemFileData.SerializeToString,
             datanode__pb2.Response.FromString,
             options, channel_credentials,
@@ -94,7 +94,7 @@ class DataNode(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/datanode.datanode.DataNode/ClientReadFromDataNode',
+        return grpc.experimental.unary_unary(request, target, '/proto3.datanode.DataNode/ClientReadFromDataNode',
             datanode__pb2.SystemFile.SerializeToString,
             datanode__pb2.File.FromString,
             options, channel_credentials,

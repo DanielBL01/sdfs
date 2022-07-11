@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x64\x61tanode.proto\x12\x11\x64\x61tanode.datanode\"3\n\x0eSystemFileData\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\x0c\"\x1e\n\nSystemFile\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\"\x17\n\x04\x46ile\x12\x0f\n\x07\x63ontent\x18\x01 \x01(\x0c\"\x1b\n\x08Response\x12\x0f\n\x07message\x18\x01 \x01(\t2\xb1\x01\n\x08\x44\x61taNode\x12Q\n\rNameNodeWrite\x12!.datanode.datanode.SystemFileData\x1a\x1b.datanode.datanode.Response\"\x00\x12R\n\x16\x43lientReadFromDataNode\x12\x1d.datanode.datanode.SystemFile\x1a\x17.datanode.datanode.File\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x64\x61tanode.proto\x12\x0fproto3.datanode\"3\n\x0eSystemFileData\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\x0c\"\x1e\n\nSystemFile\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\"\x17\n\x04\x46ile\x12\x0f\n\x07\x63ontent\x18\x01 \x01(\x0c\"\x1b\n\x08Response\x12\x0f\n\x07message\x18\x01 \x01(\t2\xa9\x01\n\x08\x44\x61taNode\x12M\n\rNameNodeWrite\x12\x1f.proto3.datanode.SystemFileData\x1a\x19.proto3.datanode.Response\"\x00\x12N\n\x16\x43lientReadFromDataNode\x12\x1b.proto3.datanode.SystemFile\x1a\x15.proto3.datanode.File\"\x00\x62\x06proto3')
 
 
 
@@ -25,28 +25,28 @@ _RESPONSE = DESCRIPTOR.message_types_by_name['Response']
 SystemFileData = _reflection.GeneratedProtocolMessageType('SystemFileData', (_message.Message,), {
   'DESCRIPTOR' : _SYSTEMFILEDATA,
   '__module__' : 'datanode_pb2'
-  # @@protoc_insertion_point(class_scope:datanode.datanode.SystemFileData)
+  # @@protoc_insertion_point(class_scope:proto3.datanode.SystemFileData)
   })
 _sym_db.RegisterMessage(SystemFileData)
 
 SystemFile = _reflection.GeneratedProtocolMessageType('SystemFile', (_message.Message,), {
   'DESCRIPTOR' : _SYSTEMFILE,
   '__module__' : 'datanode_pb2'
-  # @@protoc_insertion_point(class_scope:datanode.datanode.SystemFile)
+  # @@protoc_insertion_point(class_scope:proto3.datanode.SystemFile)
   })
 _sym_db.RegisterMessage(SystemFile)
 
 File = _reflection.GeneratedProtocolMessageType('File', (_message.Message,), {
   'DESCRIPTOR' : _FILE,
   '__module__' : 'datanode_pb2'
-  # @@protoc_insertion_point(class_scope:datanode.datanode.File)
+  # @@protoc_insertion_point(class_scope:proto3.datanode.File)
   })
 _sym_db.RegisterMessage(File)
 
 Response = _reflection.GeneratedProtocolMessageType('Response', (_message.Message,), {
   'DESCRIPTOR' : _RESPONSE,
   '__module__' : 'datanode_pb2'
-  # @@protoc_insertion_point(class_scope:datanode.datanode.Response)
+  # @@protoc_insertion_point(class_scope:proto3.datanode.Response)
   })
 _sym_db.RegisterMessage(Response)
 
@@ -54,14 +54,14 @@ _DATANODE = DESCRIPTOR.services_by_name['DataNode']
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _SYSTEMFILEDATA._serialized_start=37
-  _SYSTEMFILEDATA._serialized_end=88
-  _SYSTEMFILE._serialized_start=90
-  _SYSTEMFILE._serialized_end=120
-  _FILE._serialized_start=122
-  _FILE._serialized_end=145
-  _RESPONSE._serialized_start=147
-  _RESPONSE._serialized_end=174
-  _DATANODE._serialized_start=177
-  _DATANODE._serialized_end=354
+  _SYSTEMFILEDATA._serialized_start=35
+  _SYSTEMFILEDATA._serialized_end=86
+  _SYSTEMFILE._serialized_start=88
+  _SYSTEMFILE._serialized_end=118
+  _FILE._serialized_start=120
+  _FILE._serialized_end=143
+  _RESPONSE._serialized_start=145
+  _RESPONSE._serialized_end=172
+  _DATANODE._serialized_start=175
+  _DATANODE._serialized_end=344
 # @@protoc_insertion_point(module_scope)

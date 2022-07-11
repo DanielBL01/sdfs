@@ -8,13 +8,15 @@ the servers using the SO_REUSEPORT socket option
 
 """
 
-import contextlib
 from datetime import timedelta
+import sys
 import time
 import os
+
 from concurrent import futures
 import multiprocessing
 import socket
+import contextlib
 
 import grpc
 from datanode_pb2 import File, Response
@@ -22,10 +24,15 @@ import datanode_pb2_grpc
 
 _ONE_DAY = timedelta(days=1)
 _PROCESS_COUNT = multiprocessing.cpu_count()
+print("sdfs detects {} cores in this machine".format(_PROCESS_COUNT))
 """ For now, limit the of DataNode processes to three """
-if _PROCESS_COUNT > 4:
+if _PROCESS_COUNT > 3:
+    print("Machine meets the hardware requirements")
     _PROCESS_COUNT = 3
-_THREAD_CONCURRENCY = _PROCESS_COUNT
+    _THREAD_CONCURRENCY = _PROCESS_COUNT
+else:
+    print("Machine does not meet the hardware requirements")
+    sys.exit()
 
 parent_dir = "/Users/daniellee/.sdfs/"
 datanode_dir = parent_dir + "datanode/"
@@ -58,11 +65,15 @@ def _handle_dirs():
 def _wait_forever(server):
     try:
         while True:
-            time.sleep(_ONE_DAY.seconds())
+            time.sleep(_ONE_DAY.total_seconds())
     except KeyboardInterrupt:
+        print("DataNode server ended with KeyboardInterrupt")
         server.stop(None)
 
-def _run_server(bind_address):
+def _run_server(bind_address, datanode_env_id):
+    print("Subprocess PID: {}".format(os.getpid()))
+    """ Set env var in a subprocess """
+    os.environ['SUB_PROCESS_NUM'] = datanode_env_id 
     """ Start a server in a subprocess """
     options = (("grpc.so_reuseport", 1),)
     server = grpc.server(futures.ThreadPoolExecutor(
@@ -79,7 +90,7 @@ def _run_server(bind_address):
 @contextlib.contextmanager
 def _reserve_port():
     """ Find and reserve a port for all subprocesses to use """
-    sock = socket.socket(socket.AF_INTET6, socket.SOCK_STREAM)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
     if sock.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT) == 0:
         raise RuntimeError("Failed to set SO_REUSEPORT")
@@ -90,14 +101,16 @@ def _reserve_port():
         sock.close()
 
 def serve():
+    """ Confirm/create necessary dirs """
     _handle_dirs()
     with _reserve_port() as port:
-        bind_address = "[::]:8080"
+        bind_address = "localhost:{}".format(port)
+        print("Server binding to {}".format(bind_address))
         workers = []
-        for _ in range(_PROCESS_COUNT):
+        for i in range(_PROCESS_COUNT):
             worker = multiprocessing.Process(
                 target=_run_server,
-                args=(bind_address,)
+                args=(bind_address, "datanode_{}".format(i))
             )
             worker.start()
             workers.append(worker)

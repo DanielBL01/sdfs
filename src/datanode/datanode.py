@@ -44,7 +44,8 @@ datanode_dirs = {
 class _DataNodeServicer(datanode_pb2_grpc.DataNodeServicer):
 
     def NameNodeWrite(self, request, context):
-        active_process = os.environ("SUB_PROCESS_NUM")
+        print("Does it reach NameNodeWrite?")
+        active_process = os.environ["SUB_PROCESS_NUM"]
         filename = request.filename
         content = request.content
         system_file_path = datanode_dirs[active_process] + filename
@@ -84,9 +85,7 @@ def _run_server(bind_address, datanode_env_id):
         max_workers=_THREAD_CONCURRENCY,),
         options=options
     )
-    datanode_pb2_grpc.add_DataNodeServicer_to_server(
-        _DataNodeServicer(),
-        server)
+    datanode_pb2_grpc.add_DataNodeServicer_to_server(_DataNodeServicer(), server)
     server.add_insecure_port(bind_address)
     server.start()
     _wait_forever(server)
@@ -95,11 +94,14 @@ def _run_server(bind_address, datanode_env_id):
 def _reserve_port():
     # Find and reserve a port for all subprocesses to use
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # set value of socket option SO_REUSEPORT to balance request between servers
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
     if sock.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT) == 0:
         raise RuntimeError("Failed to set SO_REUSEPORT")
+    # binding socket to port 0 will assign it a free port
     sock.bind(("", 0))
     try:
+        # This is the free port number that has been assigned
         yield sock.getsockname()[1]
     finally:
         sock.close()
@@ -107,11 +109,13 @@ def _reserve_port():
 def serve():
     # Confirm/create necessary dirs
     _handle_dirs()
-    with _reserve_port() as port:
-        bind_address = "localhost:{}".format(port)
+
+    with _reserve_port() as datanode_port:
+        bind_address = "[::]:{}".format(datanode_port)
         print("Server binding to {}".format(bind_address))
         workers = []
         for i in range(_PROCESS_COUNT):
+            # Worker subprocesses are forked before gRPC DataNode servers start up
             worker = multiprocessing.Process(
                 target=_run_server,
                 args=(bind_address, "datanode_{}".format(i))

@@ -59,6 +59,7 @@ def handle():
 			sourcepath = sourcepath 
 		)
 		namenode_stub.ClientWrite(write_request)
+		namenode_channel.close()
 		return "post sucess"
 	
 	#elif request.method == "GET":
@@ -66,9 +67,6 @@ def handle():
 	#	read_request = datanode_pb2.SystemFile(filename = filename)
 	#	print(datanode_stub.ClientReadFromDataNode(read_request))
 	#	return "get success"
-
-	namenode_channel.close()
-	#datanode_channel.close()
 
 if __name__ == "__main__":
 	app.run(debug=True)

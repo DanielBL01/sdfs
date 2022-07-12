@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0enamenode.proto\x12\x0fproto3.namenode\"2\n\nSourceFile\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x12\n\nsourcepath\x18\x02 \x01(\t\"\x1e\n\nSystemFile\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\"\x17\n\x04\x46ile\x12\x0f\n\x07\x63ontent\x18\x01 \x01(\x0c\"\x1b\n\x08Response\x12\x0f\n\x07message\x18\x01 \x01(\t2\xa3\x01\n\x08NameNode\x12G\n\x0b\x43lientWrite\x12\x1b.proto3.namenode.SourceFile\x1a\x19.proto3.namenode.Response\"\x00\x12N\n\x16\x43lientReadFromNameNode\x12\x1b.proto3.namenode.SystemFile\x1a\x15.proto3.namenode.File\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0enamenode.proto\x12\x0fproto3.namenode\"2\n\nSourceFile\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x12\n\nsourcepath\x18\x02 \x01(\t\"\x1e\n\nSystemFile\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\"\x17\n\x04\x46ile\x12\x0f\n\x07\x63ontent\x18\x01 \x01(\x0c\"\x1b\n\x08Response\x12\x0f\n\x07message\x18\x01 \x01(\t2\xea\x01\n\x08NameNode\x12G\n\x0b\x43lientWrite\x12\x1b.proto3.namenode.SourceFile\x1a\x19.proto3.namenode.Response\"\x00\x12N\n\x16\x43lientReadFromNameNode\x12\x1b.proto3.namenode.SystemFile\x1a\x15.proto3.namenode.File\"\x00\x12\x45\n\tReplicate\x12\x1b.proto3.namenode.SystemFile\x1a\x19.proto3.namenode.Response\"\x00\x62\x06proto3')
 
 
 
@@ -63,5 +63,5 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _RESPONSE._serialized_start=144
   _RESPONSE._serialized_end=171
   _NAMENODE._serialized_start=174
-  _NAMENODE._serialized_end=337
+  _NAMENODE._serialized_end=408
 # @@protoc_insertion_point(module_scope)

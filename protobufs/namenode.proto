@@ -24,6 +24,9 @@ service NameNode {
 
     // Client reads from NameNode
     rpc ClientReadFromNameNode(SystemFile) returns (File) {}
+
+    // Node Manager detects new file and replicates
+    rpc Replicate(SystemFile) returns (Response) {}
 }
 
 message SourceFile {

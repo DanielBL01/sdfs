@@ -1,0 +1,9 @@
+#/bin/zsh
+GRPC_VERBOSITY=debug
+GRPC_TRACE=all
+# This simple test will send the POST request to the REST endpoint to the client. That will call ClientWrite that NameNode implements.
+# So NameNode will write test_one.txt to the namenode/ dir. So at this point, run NameNode First then Client then this script. 
+# Now for replication, run the DataNode that will setup the Server and then run Node Manager
+curl -X POST http://127.0.0.1:5000/ -d '{"name": "test_one.txt", "path": "/Users/daniellee/workplace/sdfs/src/test_files/test_one.txt"}' -H 'Content-Type: application/json'
+
+# curl -X GET http://127.0.0.1:5000/ -d '{"name": "test_one.txt"}' -H 'Content-Type: application/json'

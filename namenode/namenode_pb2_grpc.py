@@ -24,6 +24,11 @@ class NameNodeStub(object):
                 request_serializer=namenode__pb2.SystemFile.SerializeToString,
                 response_deserializer=namenode__pb2.File.FromString,
                 )
+        self.Replicate = channel.unary_unary(
+                '/proto3.namenode.NameNode/Replicate',
+                request_serializer=namenode__pb2.SystemFile.SerializeToString,
+                response_deserializer=namenode__pb2.Response.FromString,
+                )
 
 
 class NameNodeServicer(object):
@@ -49,6 +54,13 @@ class NameNodeServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def Replicate(self, request, context):
+        """Node Manager detects new file and replicates
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_NameNodeServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -61,6 +73,11 @@ def add_NameNodeServicer_to_server(servicer, server):
                     servicer.ClientReadFromNameNode,
                     request_deserializer=namenode__pb2.SystemFile.FromString,
                     response_serializer=namenode__pb2.File.SerializeToString,
+            ),
+            'Replicate': grpc.unary_unary_rpc_method_handler(
+                    servicer.Replicate,
+                    request_deserializer=namenode__pb2.SystemFile.FromString,
+                    response_serializer=namenode__pb2.Response.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -103,5 +120,22 @@ class NameNode(object):
         return grpc.experimental.unary_unary(request, target, '/proto3.namenode.NameNode/ClientReadFromNameNode',
             namenode__pb2.SystemFile.SerializeToString,
             namenode__pb2.File.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Replicate(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/proto3.namenode.NameNode/Replicate',
+            namenode__pb2.SystemFile.SerializeToString,
+            namenode__pb2.Response.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

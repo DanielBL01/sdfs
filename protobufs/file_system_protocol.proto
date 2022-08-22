@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package sdfs;
+
+// Best practice states to keep everything as optional as no one can accurately predict the far future
+service FileSystem {
+	rpc DownloadFile (DownloadRequest) returns (stream DownloadResponse) {}
+	rpc UploadFile (stream UploadRequest) returns (UploadResponse) {}
+}
+
+message UploadRequest {
+	optional FileMetaData fileMetaData = 1;
+	optional File uploadFile = 2;
+}
+
+message UploadResponse {
+	optional string status = 1;
+}
+
+message DownloadRequest {
+	optional FileMetaData fileMetaData = 1;
+}
+
+// Download response are sent in a stream in the order FileMetaData then File
+message DownloadResponse {
+	optional string status = 1;
+}
+
+message FileMetaData {
+	optional string name = 1;
+}
+
+message File {
+	optional bytes content = 1;
+}

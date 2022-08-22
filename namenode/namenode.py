@@ -1,116 +1,55 @@
 """
 
-gRPC Server Code for NameNode    
-
-For now, the user does not specify a port for the server and it set at 9000
-
-Note that the Client service is user-facing and implements REST
-while namenode is a gRPC server AND Client for gRPC DataNode server
-
-Note to self: A process is an instance of the python interpreter
-that executes python instructions (Python byte-code) i.e. a running
-instance of your python program
-
-A process has at least one thread called MainThread where a thread
-is like a line of execution within a process.
-
-Here a server is the process and we can have multiple threads which
-may pick up requests from the client from a queue.
-
-To do this, we're going to implement multiprocessing based servers.
+namenode.py is the gRPC client for the NameNode, The NameNode does not store data itself. However,
+the NameNode is responsible for handling the FSImage and EditLog. The FSImage stores the complete snapshot
+of the file system metadata at specific moments of time. The EditLog stores the incremental changes like
+renaming or appending to a file for durability. This is so that SDFS does not have to create a new FSImage
+snapshot each time the namespace is modified. This means there will be some latency.
 
 """
 
-import os
-from concurrent import futures
-import socket
-import sys
-import logging
-from datetime import timedelta
-import time
-import argparse
-from pathlib import Path
-
 import grpc
-from namenode_pb2 import File, Response 
-import namenode_pb2_grpc
+import file_system_protocol_pb2
+from file_system_protocol_pb2 import File, FileMetaData, UploadRequest
+import file_system_protocol_pb2_grpc
 
-_ONE_DAY = timedelta(days=1)
+channel = grpc.insecure_channel('localhost:50051')
+stub = file_system_protocol_pb2_grpc.FileSystemStub(channel)
 
-# Configure logger to be at the lowest level i.e. INFO to log everything
-logging.basicConfig(
-    filename="namenode.log", 
-    format="%(asctime)s %(levelname)-8s %(message)s",
-    level=logging.INFO,
-    datefmt="%Y-%m-%d %H:%M:%S")
-_LOGGER = logging.getLogger(__name__)
+# Uploading a file takes in a request as a stream and outputs a response
+# In gRPC lang, this is called a request-streaming RPC
 
-host = os.getenv("HOST", "localhost")
-namenode_dir = None 
+def generate_file_iterator():
+	file_name = "dummy.txt"
+	file_name_2 = "dummy2.txt"
+	metadata1 = FileMetaData(name = file_name)
+	metadata2 = FileMetaData(name = file_name_2)
+	content1 = None
+	content2 = None
+	with open("/Users/daniellee/dummy.txt", "rb") as f:
+		content1 = f.read()
+	with open("/Users/daniellee/dummy2.txt", "rb") as f2:
+		content2 = f2.read()
+	file1 = File(content = content1)
+	file2 = File(content = content2)
+	# Yield to return a generator for stream request
+	yield UploadRequest(fileMetaData = metadata1, uploadFile = file1)
+	yield UploadRequest(fileMetaData = metadata2, uploadFile = file2)
 
-class _NameNodeServicer(namenode_pb2_grpc.NameNodeServicer):
+def upload_file(stub):
+	# Uploading a file takes in a request as a stream and outputs a response
+	# In gRPC lang, this is called a request-streaming RPC
+	
+	# This should be done with argparse, but for now, let's do it manually
+	# This should be done using yield to create the generator when we read the files one by one
+	file_iterator = generate_file_iterator()
+	response = stub.UploadFile(file_iterator)
+	print(response)
+	
+def run():
+	with grpc.insecure_channel('localhost:50051') as channel:
+		stub = file_system_protocol_pb2_grpc.FileSystemStub(channel)
+		upload_file(stub)
 
-    def ClientWrite(self, request, context):
-        # Write rpc gets SourceFile message and returns Response message
-        filename = request.filename
-        source_path = request.sourcepath
-        with open(source_path, "rb") as source_binary_file:
-            source_binary_file_content = source_binary_file.read()
-            system_file_path = namenode_dir + filename
-            with open(system_file_path, "wb") as system_binary_file:
-                system_binary_file.write(source_binary_file_content) 
-        return Response(message = "Successfully wrote to filesystem")
-
-    def ClientReadFromNameNode(self, request, context):
-        # Read rpc gets a SystemFile message and returns File message
-        filename = request.filename
-        system_file_path = namenode_dir + filename 
-        with open(system_file_path, "rb") as system_binary_file:
-            system_binary_file_content = system_binary_file.read()
-        return File(content = system_binary_file_content)
-
-def _setup_namenode_dir():
-    if namenode_dir is not None:
-        if not os.path.isdir(namenode_dir):
-            os.makedirs(namenode_dir)
-        rep_log_path = namenode_dir + "replication.log"
-        if not os.path.exists(rep_log_path):
-            Path(rep_log_path).touch()
-
-def _check_port_in_use(port):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        res = sock.connect_ex(("localhost", port))
-        # connect_ex will return 0 if successful i.e the port is in use
-        if res == 0:
-            print("Please ensure that port 9000 is open for NameNode")
-            sys.exit()
-
-def _wait_forever(server):
-    try:
-        while True:
-            time.sleep(_ONE_DAY.total_seconds())
-    except KeyboardInterrupt:
-        print("Stopping the NameNode server")
-        server.stop(None)
-
-def serve():
-    global namenode_dir
-    msg = "Specify the parent directory for sdfs - simple distributed file system"
-    parser = argparse.ArgumentParser(description=msg)
-    # This is a position argument so the datanode server must be the first argument after the script name
-    parser.add_argument("parent_dir", help="The parent directory for your files (e.g. /Users/whoami/.sdfs)")
-    args = parser.parse_args()
-    parent_dir = args.parent_dir
-    namenode_dir = parent_dir + "/namenode/"
-
-    _setup_namenode_dir()
-
-    _check_port_in_use(9000)
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    namenode_pb2_grpc.add_NameNodeServicer_to_server(
-        _NameNodeServicer(), server)
-    server.add_insecure_port('[::]:9000')
-    server.start()
-    _wait_forever(server)
-if __name__ == "__main__":
-    serve()
+if __name__ == '__main__':
+	run()

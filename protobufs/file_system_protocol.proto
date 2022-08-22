@@ -6,6 +6,7 @@ package sdfs;
 service FileSystem {
 	rpc DownloadFile (DownloadRequest) returns (stream DownloadResponse) {}
 	rpc UploadFile (stream UploadRequest) returns (UploadResponse) {}
+	rpc Connect (ConnectionRequest) returns (ConnectionResponse) {}
 }
 
 message UploadRequest {
@@ -32,4 +33,12 @@ message FileMetaData {
 
 message File {
 	optional bytes content = 1;
+}
+
+message ConnectionRequest {
+	optional int32 volume = 1;
+}
+
+message ConnectionResponse {
+	optional string status = 1;
 }

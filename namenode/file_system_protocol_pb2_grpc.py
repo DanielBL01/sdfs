@@ -25,6 +25,11 @@ class FileSystemStub(object):
                 request_serializer=file__system__protocol__pb2.UploadRequest.SerializeToString,
                 response_deserializer=file__system__protocol__pb2.UploadResponse.FromString,
                 )
+        self.Connect = channel.unary_unary(
+                '/sdfs.FileSystem/Connect',
+                request_serializer=file__system__protocol__pb2.ConnectionRequest.SerializeToString,
+                response_deserializer=file__system__protocol__pb2.ConnectionResponse.FromString,
+                )
 
 
 class FileSystemServicer(object):
@@ -43,6 +48,12 @@ class FileSystemServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def Connect(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_FileSystemServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -55,6 +66,11 @@ def add_FileSystemServicer_to_server(servicer, server):
                     servicer.UploadFile,
                     request_deserializer=file__system__protocol__pb2.UploadRequest.FromString,
                     response_serializer=file__system__protocol__pb2.UploadResponse.SerializeToString,
+            ),
+            'Connect': grpc.unary_unary_rpc_method_handler(
+                    servicer.Connect,
+                    request_deserializer=file__system__protocol__pb2.ConnectionRequest.FromString,
+                    response_serializer=file__system__protocol__pb2.ConnectionResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -98,5 +114,22 @@ class FileSystem(object):
         return grpc.experimental.stream_unary(request_iterator, target, '/sdfs.FileSystem/UploadFile',
             file__system__protocol__pb2.UploadRequest.SerializeToString,
             file__system__protocol__pb2.UploadResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Connect(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/sdfs.FileSystem/Connect',
+            file__system__protocol__pb2.ConnectionRequest.SerializeToString,
+            file__system__protocol__pb2.ConnectionResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

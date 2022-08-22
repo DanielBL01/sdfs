@@ -10,13 +10,16 @@ snapshot each time the namespace is modified. This means there will be some late
 
 import grpc
 import file_system_protocol_pb2
-from file_system_protocol_pb2 import File, FileMetaData, UploadRequest
+from file_system_protocol_pb2 import File, FileMetaData, UploadRequest, ConnectionRequest
 import file_system_protocol_pb2_grpc
 import logging
 import os
+import argparse
+import random
 
 _EDIT_LOG = None
 _FS_IMAGE = None
+_VOLUME_PORTS = None
 _FORMATTER = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 
 def _setup_logger(name, log_file, level=logging.INFO):
@@ -46,6 +49,13 @@ def _update_internal_fsimage():
 	# At time intervals, update the complete file system namespace using editlog
 	return
 
+def _parse_arguments():
+	# No way a client can know which servers are available unless specified
+	parser = argparse.ArgumentParser(description = 'List volume servers.')
+	parser.add_argument('-ports', nargs='+', type=int)
+	args = parser.parse_args()
+	return args.ports
+
 def generate_file_iterator():
 	file_name = "dummy.txt"
 	file_name_2 = "dummy2.txt"
@@ -63,23 +73,23 @@ def generate_file_iterator():
 	yield UploadRequest(fileMetaData = metadata1, uploadFile = file1)
 	yield UploadRequest(fileMetaData = metadata2, uploadFile = file2)
 
-# Uploading a file takes in a request as a stream and outputs a response
-# In gRPC lang, this is called a request-streaming RPC
-def upload_file(stub):
-	# Uploading a file takes in a request as a stream and outputs a response
-	# In gRPC lang, this is called a request-streaming RPC
-	
-	# This should be done with argparse, but for now, let's do it manually
-	# This should be done using yield to create the generator when we read the files one by one
+# Uploading a file takes in a request as a stream and outputs a response.This is a request-streaming RPC
+def upload_file():
 	file_iterator = generate_file_iterator()
-	response = stub.UploadFile(file_iterator)
-	print(response)
-	
-def run():
-	with grpc.insecure_channel('localhost:50051') as channel:
+	# For now, let's choose a random stub to put the file, but this should have more context
+	random_port = random.choice(_VOLUME_PORTS) 
+	connection_volume = ConnectionRequest(volume = random_port)
+	with grpc.insecure_channel('localhost:{}'.format(random_port)) as channel:
 		stub = file_system_protocol_pb2_grpc.FileSystemStub(channel)
-		upload_file(stub)
+		connection_response = stub.Connect(connection_volume)
+		print(connection_response)
+		response = stub.UploadFile(file_iterator)
+		print(response)
+	
+def _run():
+	upload_file()
 
 if __name__ == '__main__':
+	_VOLUME_PORTS = _parse_arguments()
 	_setup_namespace()
-    # run()
+	_run()

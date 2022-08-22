@@ -12,12 +12,39 @@ import grpc
 import file_system_protocol_pb2
 from file_system_protocol_pb2 import File, FileMetaData, UploadRequest
 import file_system_protocol_pb2_grpc
+import logging
+import os
 
-channel = grpc.insecure_channel('localhost:50051')
-stub = file_system_protocol_pb2_grpc.FileSystemStub(channel)
+_EDIT_LOG = None
+_FS_IMAGE = None
+_FORMATTER = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 
-# Uploading a file takes in a request as a stream and outputs a response
-# In gRPC lang, this is called a request-streaming RPC
+def _setup_logger(name, log_file, level=logging.INFO):
+	"""Helper method to Setup logging for both fsimage and editlog"""
+	handler = logging.FileHandler(log_file)
+	handler.setFormatter(_FORMATTER)
+	logger = logging.getLogger(name)
+	logger.setLevel(level)
+	logger.addHandler(handler)
+	return logger
+
+def _setup_namespace():
+	user = os.path.expanduser("~")
+	parent_dir = user + "/.sdfs/"
+	namenode_dir = parent_dir + "namenode/"
+	if not os.path.isdir(parent_dir):
+		os.mkdir(parent_dir)
+	if not os.path.isdir(namenode_dir):
+		os.mkdir(namenode_dir)
+	edit_log_file = namenode_dir + "edit.log"
+	_EDIT_LOG = _setup_logger("editlog", edit_log_file)
+	fs_image_file = namenode_dir + "fsimage.log"
+	_FS_IMAGE = _setup_logger("fsimage", fs_image_file)
+	# _EDIT_LOG.info("Testing writing to logger")
+
+def _update_internal_fsimage():
+	# At time intervals, update the complete file system namespace using editlog
+	return
 
 def generate_file_iterator():
 	file_name = "dummy.txt"
@@ -36,6 +63,8 @@ def generate_file_iterator():
 	yield UploadRequest(fileMetaData = metadata1, uploadFile = file1)
 	yield UploadRequest(fileMetaData = metadata2, uploadFile = file2)
 
+# Uploading a file takes in a request as a stream and outputs a response
+# In gRPC lang, this is called a request-streaming RPC
 def upload_file(stub):
 	# Uploading a file takes in a request as a stream and outputs a response
 	# In gRPC lang, this is called a request-streaming RPC
@@ -52,4 +81,5 @@ def run():
 		upload_file(stub)
 
 if __name__ == '__main__':
-	run()
+	_setup_namespace()
+    # run()

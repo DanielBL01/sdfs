@@ -32,6 +32,8 @@ def _setup_logger(name, log_file, level=logging.INFO):
 	return logger
 
 def _setup_namespace():
+	global _EDIT_LOG
+	global _FS_IMAGE
 	user = os.path.expanduser("~")
 	parent_dir = user + "/.sdfs/"
 	namenode_dir = parent_dir + "namenode/"
@@ -56,40 +58,33 @@ def _parse_arguments():
 	args = parser.parse_args()
 	return args.ports
 
-def generate_file_iterator():
-	file_name = "dummy.txt"
-	file_name_2 = "dummy2.txt"
-	metadata1 = FileMetaData(name = file_name)
-	metadata2 = FileMetaData(name = file_name_2)
-	content1 = None
-	content2 = None
-	with open("/Users/daniellee/dummy.txt", "rb") as f:
-		content1 = f.read()
-	with open("/Users/daniellee/dummy2.txt", "rb") as f2:
-		content2 = f2.read()
-	file1 = File(content = content1)
-	file2 = File(content = content2)
-	# Yield to return a generator for stream request
-	yield UploadRequest(fileMetaData = metadata1, uploadFile = file1)
-	yield UploadRequest(fileMetaData = metadata2, uploadFile = file2)
+def generate_file_iterator(text_list):
+	user = os.path.expanduser("~")
+	for text_file in text_list:
+		metadata = FileMetaData(name = text_file)
+		with open(user + "/" + text_file, "rb") as f:
+			content = f.read()
+			upload_file = File(content = content)
+			yield UploadRequest(fileMetaData = metadata, uploadFile = upload_file)
 
 # Uploading a file takes in a request as a stream and outputs a response.This is a request-streaming RPC
-def upload_file():
-	file_iterator = generate_file_iterator()
-	# For now, let's choose a random stub to put the file, but this should have more context
-	random_port = random.choice(_VOLUME_PORTS) 
-	connection_volume = ConnectionRequest(volume = random_port)
-	with grpc.insecure_channel('localhost:{}'.format(random_port)) as channel:
-		stub = file_system_protocol_pb2_grpc.FileSystemStub(channel)
-		connection_response = stub.Connect(connection_volume)
-		print(connection_response)
-		response = stub.UploadFile(file_iterator)
-		print(response)
-	
+def _upload_file(stub):
+	text_list = ["dummy.txt", "dummy2.txt"]
+	file_iterator = generate_file_iterator(text_list)
+	response = stub.UploadFile(file_iterator)
+	print(response)
+
 def _run():
-	upload_file()
+	global _VOLUME_PORTS
+	_VOLUME_PORTS = _parse_arguments()
+	random_port = random.choice(_VOLUME_PORTS)
+	connection_volume = ConnectionRequest(volume = random_port)
+	channel = grpc.insecure_channel('localhost:{}'.format(random_port))
+	stub = file_system_protocol_pb2_grpc.FileSystemStub(channel)
+	_setup_namespace()
+	connection_response = stub.Connect(connection_volume)
+	print(connection_response)
+	_upload_file(stub)
 
 if __name__ == '__main__':
-	_VOLUME_PORTS = _parse_arguments()
-	_setup_namespace()
 	_run()

@@ -7,6 +7,7 @@ service FileSystem {
 	rpc DownloadFile (DownloadRequest) returns (stream DownloadResponse) {}
 	rpc UploadFile (stream UploadRequest) returns (UploadResponse) {}
 	rpc Connect (ConnectionRequest) returns (ConnectionResponse) {}
+	rpc Rename (RenameRequest) returns (GenericResponse) {}
 }
 
 message UploadRequest {
@@ -40,5 +41,14 @@ message ConnectionRequest {
 }
 
 message ConnectionResponse {
+	optional string status = 1;
+}
+
+message RenameRequest {
+	optional FileMetaData fileMetaData = 1;
+	optional string newName = 2;
+}
+
+message GenericResponse {
 	optional string status = 1;
 }

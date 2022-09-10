@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1a\x66ile_system_protocol.proto\x12\x04sdfs\"\x83\x01\n\rUploadRequest\x12-\n\x0c\x66ileMetaData\x18\x01 \x01(\x0b\x32\x12.sdfs.FileMetaDataH\x00\x88\x01\x01\x12#\n\nuploadFile\x18\x02 \x01(\x0b\x32\n.sdfs.FileH\x01\x88\x01\x01\x42\x0f\n\r_fileMetaDataB\r\n\x0b_uploadFile\"0\n\x0eUploadResponse\x12\x13\n\x06status\x18\x01 \x01(\tH\x00\x88\x01\x01\x42\t\n\x07_status\"Q\n\x0f\x44ownloadRequest\x12-\n\x0c\x66ileMetaData\x18\x01 \x01(\x0b\x32\x12.sdfs.FileMetaDataH\x00\x88\x01\x01\x42\x0f\n\r_fileMetaData\"2\n\x10\x44ownloadResponse\x12\x13\n\x06status\x18\x01 \x01(\tH\x00\x88\x01\x01\x42\t\n\x07_status\"*\n\x0c\x46ileMetaData\x12\x11\n\x04name\x18\x01 \x01(\tH\x00\x88\x01\x01\x42\x07\n\x05_name\"(\n\x04\x46ile\x12\x14\n\x07\x63ontent\x18\x01 \x01(\x0cH\x00\x88\x01\x01\x42\n\n\x08_content\"3\n\x11\x43onnectionRequest\x12\x13\n\x06volume\x18\x01 \x01(\x05H\x00\x88\x01\x01\x42\t\n\x07_volume\"4\n\x12\x43onnectionResponse\x12\x13\n\x06status\x18\x01 \x01(\tH\x00\x88\x01\x01\x42\t\n\x07_status2\xcc\x01\n\nFileSystem\x12\x41\n\x0c\x44ownloadFile\x12\x15.sdfs.DownloadRequest\x1a\x16.sdfs.DownloadResponse\"\x00\x30\x01\x12;\n\nUploadFile\x12\x13.sdfs.UploadRequest\x1a\x14.sdfs.UploadResponse\"\x00(\x01\x12>\n\x07\x43onnect\x12\x17.sdfs.ConnectionRequest\x1a\x18.sdfs.ConnectionResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1a\x66ile_system_protocol.proto\x12\x04sdfs\"\x83\x01\n\rUploadRequest\x12-\n\x0c\x66ileMetaData\x18\x01 \x01(\x0b\x32\x12.sdfs.FileMetaDataH\x00\x88\x01\x01\x12#\n\nuploadFile\x18\x02 \x01(\x0b\x32\n.sdfs.FileH\x01\x88\x01\x01\x42\x0f\n\r_fileMetaDataB\r\n\x0b_uploadFile\"0\n\x0eUploadResponse\x12\x13\n\x06status\x18\x01 \x01(\tH\x00\x88\x01\x01\x42\t\n\x07_status\"Q\n\x0f\x44ownloadRequest\x12-\n\x0c\x66ileMetaData\x18\x01 \x01(\x0b\x32\x12.sdfs.FileMetaDataH\x00\x88\x01\x01\x42\x0f\n\r_fileMetaData\"2\n\x10\x44ownloadResponse\x12\x13\n\x06status\x18\x01 \x01(\tH\x00\x88\x01\x01\x42\t\n\x07_status\"*\n\x0c\x46ileMetaData\x12\x11\n\x04name\x18\x01 \x01(\tH\x00\x88\x01\x01\x42\x07\n\x05_name\"(\n\x04\x46ile\x12\x14\n\x07\x63ontent\x18\x01 \x01(\x0cH\x00\x88\x01\x01\x42\n\n\x08_content\"3\n\x11\x43onnectionRequest\x12\x13\n\x06volume\x18\x01 \x01(\x05H\x00\x88\x01\x01\x42\t\n\x07_volume\"4\n\x12\x43onnectionResponse\x12\x13\n\x06status\x18\x01 \x01(\tH\x00\x88\x01\x01\x42\t\n\x07_status\"q\n\rRenameRequest\x12-\n\x0c\x66ileMetaData\x18\x01 \x01(\x0b\x32\x12.sdfs.FileMetaDataH\x00\x88\x01\x01\x12\x14\n\x07newName\x18\x02 \x01(\tH\x01\x88\x01\x01\x42\x0f\n\r_fileMetaDataB\n\n\x08_newName\"1\n\x0fGenericResponse\x12\x13\n\x06status\x18\x01 \x01(\tH\x00\x88\x01\x01\x42\t\n\x07_status2\x84\x02\n\nFileSystem\x12\x41\n\x0c\x44ownloadFile\x12\x15.sdfs.DownloadRequest\x1a\x16.sdfs.DownloadResponse\"\x00\x30\x01\x12;\n\nUploadFile\x12\x13.sdfs.UploadRequest\x1a\x14.sdfs.UploadResponse\"\x00(\x01\x12>\n\x07\x43onnect\x12\x17.sdfs.ConnectionRequest\x1a\x18.sdfs.ConnectionResponse\"\x00\x12\x36\n\x06Rename\x12\x13.sdfs.RenameRequest\x1a\x15.sdfs.GenericResponse\"\x00\x62\x06proto3')
 
 
 
@@ -26,6 +26,8 @@ _FILEMETADATA = DESCRIPTOR.message_types_by_name['FileMetaData']
 _FILE = DESCRIPTOR.message_types_by_name['File']
 _CONNECTIONREQUEST = DESCRIPTOR.message_types_by_name['ConnectionRequest']
 _CONNECTIONRESPONSE = DESCRIPTOR.message_types_by_name['ConnectionResponse']
+_RENAMEREQUEST = DESCRIPTOR.message_types_by_name['RenameRequest']
+_GENERICRESPONSE = DESCRIPTOR.message_types_by_name['GenericResponse']
 UploadRequest = _reflection.GeneratedProtocolMessageType('UploadRequest', (_message.Message,), {
   'DESCRIPTOR' : _UPLOADREQUEST,
   '__module__' : 'file_system_protocol_pb2'
@@ -82,6 +84,20 @@ ConnectionResponse = _reflection.GeneratedProtocolMessageType('ConnectionRespons
   })
 _sym_db.RegisterMessage(ConnectionResponse)
 
+RenameRequest = _reflection.GeneratedProtocolMessageType('RenameRequest', (_message.Message,), {
+  'DESCRIPTOR' : _RENAMEREQUEST,
+  '__module__' : 'file_system_protocol_pb2'
+  # @@protoc_insertion_point(class_scope:sdfs.RenameRequest)
+  })
+_sym_db.RegisterMessage(RenameRequest)
+
+GenericResponse = _reflection.GeneratedProtocolMessageType('GenericResponse', (_message.Message,), {
+  'DESCRIPTOR' : _GENERICRESPONSE,
+  '__module__' : 'file_system_protocol_pb2'
+  # @@protoc_insertion_point(class_scope:sdfs.GenericResponse)
+  })
+_sym_db.RegisterMessage(GenericResponse)
+
 _FILESYSTEM = DESCRIPTOR.services_by_name['FileSystem']
 if _descriptor._USE_C_DESCRIPTORS == False:
 
@@ -102,6 +118,10 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _CONNECTIONREQUEST._serialized_end=492
   _CONNECTIONRESPONSE._serialized_start=494
   _CONNECTIONRESPONSE._serialized_end=546
-  _FILESYSTEM._serialized_start=549
-  _FILESYSTEM._serialized_end=753
+  _RENAMEREQUEST._serialized_start=548
+  _RENAMEREQUEST._serialized_end=661
+  _GENERICRESPONSE._serialized_start=663
+  _GENERICRESPONSE._serialized_end=712
+  _FILESYSTEM._serialized_start=715
+  _FILESYSTEM._serialized_end=975
 # @@protoc_insertion_point(module_scope)

@@ -27,15 +27,18 @@ class FileSystemServicer(file_system_protocol_pb2_grpc.FileSystemServicer):
 			filename = upload_request.fileMetaData.name
 			content = upload_request.uploadFile.content
 			content_str = content.decode('utf-8')
+			print(_CURRENT_VOLUME)
 			datanode_store = _VOLUME_SERVERS[_CURRENT_VOLUME]['store']
+			print(datanode_store)
 			filename_path = datanode_store + filename 
-			print("Attempting to create file name: " + filename)
 			with open(filename_path, 'w') as f:
 				f.write(content_str)
 		return UploadResponse(status = 'upload success')
 
 	def Connect(self, request, context):
+		global _CURRENT_VOLUME
 		_CURRENT_VOLUME = request.volume 
+		print(_CURRENT_VOLUME)
 		return ConnectionResponse(status = 'connection success') 
 
 def _setup_datanode(count):
@@ -46,7 +49,7 @@ def _setup_datanode(count):
 		os.mkdir(volume_dir)
 		if not os.path.isdir(namenode_dir):
 			os.mkdir(namenode_dir)
-			return namenode_dir
+	return namenode_dir
 
 def _reserve_volume_ports():
 	for _ in range(3):
@@ -58,6 +61,7 @@ def _reserve_volume_ports():
 			sock.close()
 
 def _serve():
+	global _VOLUME_SERVERS
 	_VOLUME_SERVERS = {}
 	count = 1
 	try:
@@ -71,6 +75,7 @@ def _serve():
 			datanode = _setup_datanode(str(count))
 			_VOLUME_SERVERS[port] = {'server': server, 'store': datanode} 
 			count = count + 1
+		print(_VOLUME_SERVERS)
 		while True:
 			# Instead of waiting for termination, start servers and explicitly wait for KeyboardInterrupt to handle stop
 			time.sleep(_ONE_DAY.total_seconds())	

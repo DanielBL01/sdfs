@@ -9,7 +9,7 @@ that is being used
 """
 import grpc
 import file_system_protocol_pb2
-from file_system_protocol_pb2 import File, FileMetaData, UploadResponse, ConnectionResponse, DownloadResponse 
+from file_system_protocol_pb2 import File, FileMetaData, UploadResponse, ConnectionResponse, DownloadResponse, HeartBeatResponse
 import file_system_protocol_pb2_grpc 
 from concurrent import futures
 import socket
@@ -56,6 +56,9 @@ class FileSystemServicer(file_system_protocol_pb2_grpc.FileSystemServicer):
 		# Get each file as an object to return and return the generator
 
 		return DownloadResponse(status = 'get success', logs = logs)  
+
+	def HeartBeat(self, request, context):
+		return HeartBeatResponse(status = 'alive')
 
 	def Connect(self, request, context):
 		global _CURRENT_VOLUME

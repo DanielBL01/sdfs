@@ -10,16 +10,19 @@ snapshot each time the namespace is modified. This means there will be some late
 
 import grpc
 import file_system_protocol_pb2
-from file_system_protocol_pb2 import File, FileMetaData, UploadRequest, ConnectionRequest
+from file_system_protocol_pb2 import File, FileMetaData, UploadRequest, ConnectionRequest, HeartBeatRequest
 import file_system_protocol_pb2_grpc
 import logging
 import os
 import argparse
 import random
+import threading
+import time
 
 _EDIT_LOG = None
 _FS_IMAGE = None
 _VOLUME_PORTS = None
+_VOLUME_STUBS = None
 _FORMATTER = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 
 def _setup_logger(name, log_file, level=logging.INFO):
@@ -50,9 +53,27 @@ def _setup_namespace():
 def _update_internal_fsimage():
 	# At time intervals, update the complete file system namespace using editlog
 	# Since we want to continuously run an update fs image function in the background, we can keep it as a seperate thread
-
-
 	return
+
+def heartbeat_check_datanodes():
+	# Implement heartbeat check of all gRPC server given their localhost ports
+	while (True):
+		if (_EDIT_LOG and _VOLUME_STUBS):
+			request = HeartBeatRequest()
+			for port in _VOLUME_STUBS.keys():
+				stub = _VOLUME_STUBS[port]
+				response = stub.HeartBeat(request)
+				if (response):
+					_EDIT_LOG.info("Volume server running on port {} is alive!".format(port))
+			time.sleep(5)
+		else:
+			continue
+
+def run_heartbeat():
+	# Run the heartbeat check in a different thread to run asynchronously in the background
+	# Run the thread as a daemon such that when __main__ ends, the daemon is killed
+	heartbeat = threading.Thread(target=heartbeat_check_datanodes, daemon=True)
+	heartbeat.start()
 
 def _parse_arguments():
 	# No way a client can know which servers are available unless specified
@@ -60,6 +81,15 @@ def _parse_arguments():
 	parser.add_argument('-ports', nargs='+', type=int)
 	args = parser.parse_args()
 	return args.ports
+
+def _init_volume_stubs():
+	if (_VOLUME_PORTS):
+		global _VOLUME_STUBS
+		_VOLUME_STUBS = {}
+		for port in _VOLUME_PORTS:
+			channel = grpc.insecure_channel('localhost:{}'.format(port))
+			stub = file_system_protocol_pb2_grpc.FileSystemStub(channel)
+			_VOLUME_STUBS[port] = stub
 
 def generate_file_iterator(text_list):
 	user = os.path.expanduser("~")
@@ -84,6 +114,7 @@ def _upload_file(stub):
 def _run():
 	global _VOLUME_PORTS
 	_VOLUME_PORTS = _parse_arguments()
+	_init_volume_stubs()
 	random_port = random.choice(_VOLUME_PORTS)
 	connection_volume = ConnectionRequest(volume = random_port)
 	channel = grpc.insecure_channel('localhost:{}'.format(random_port))
@@ -92,6 +123,9 @@ def _run():
 	connection_response = stub.Connect(connection_volume)
 	print(connection_response)
 	_upload_file(stub)
+	run_heartbeat()
 
 if __name__ == '__main__':
 	_run()
+	while (True):
+		continue

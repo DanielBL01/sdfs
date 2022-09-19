@@ -8,6 +8,7 @@ service FileSystem {
 	rpc UploadFile (stream UploadRequest) returns (UploadResponse) {}
 	rpc Connect (ConnectionRequest) returns (ConnectionResponse) {}
 	rpc Rename (RenameRequest) returns (GenericResponse) {}
+	rpc HeartBeat (HeartBeatRequest) returns (HeartBeatResponse) {}
 }
 
 message UploadRequest {
@@ -28,6 +29,14 @@ message DownloadRequest {
 message DownloadResponse {
 	optional string status = 1;
 	optional string logs = 2;
+}
+
+message HeartBeatRequest {
+	optional string null = 1;
+}
+
+message HeartBeatResponse {
+	optional string status = 1;
 }
 
 message FileMetaData {

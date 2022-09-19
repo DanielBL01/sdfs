@@ -49,6 +49,9 @@ def _setup_namespace():
 
 def _update_internal_fsimage():
 	# At time intervals, update the complete file system namespace using editlog
+	# Since we want to continuously run an update fs image function in the background, we can keep it as a seperate thread
+
+
 	return
 
 def _parse_arguments():
@@ -67,12 +70,16 @@ def generate_file_iterator(text_list):
 			upload_file = File(content = content)
 			yield UploadRequest(fileMetaData = metadata, uploadFile = upload_file)
 
-# Uploading a file takes in a request as a stream and outputs a response.This is a request-streaming RPC
+# Uploading a file takes in a request as a stream and outputs a response. This is a request-streaming RPC
 def _upload_file(stub):
+	# This should be user input but that should be easy to implement
 	text_list = ["dummy.txt", "dummy2.txt"]
 	file_iterator = generate_file_iterator(text_list)
 	response = stub.UploadFile(file_iterator)
-	print(response)
+	logs = response.logs
+	# Upload file is a request stream so it's possible to have multiple "put" logs
+	for log in logs:
+		_EDIT_LOG.info(log)
 
 def _run():
 	global _VOLUME_PORTS

@@ -3,10 +3,13 @@
 datanode.py is the gRPC server that will act as the volume server to store the data. Each server running
 will be tied to a specific namespace.
 
+Since this is just a simulation, the datanode will instantiate multiple servers but will keep a record of the current volume
+that is being used
+
 """
 import grpc
 import file_system_protocol_pb2
-from file_system_protocol_pb2 import File, FileMetaData, UploadResponse, ConnectionResponse 
+from file_system_protocol_pb2 import File, FileMetaData, UploadResponse, ConnectionResponse, DownloadResponse 
 import file_system_protocol_pb2_grpc 
 from concurrent import futures
 import socket
@@ -23,7 +26,8 @@ _CURRENT_VOLUME = None
 class FileSystemServicer(file_system_protocol_pb2_grpc.FileSystemServicer):
 	"""Provide method implementations of file system server"""
 	def UploadFile(self, request_iterator, context):
-		"""Supports uploading multiple files into file system. NOTE: This is write, not append in Pythond"""
+		"""Supports uploading multiple files into file system. NOTE: This is write, not append in Python"""
+		logs = []
 		for upload_request in request_iterator:
 			filename = upload_request.fileMetaData.name
 			content = upload_request.uploadFile.content
@@ -36,7 +40,9 @@ class FileSystemServicer(file_system_protocol_pb2_grpc.FileSystemServicer):
 				with open(filename_path, 'wb') as f:
 					f.write(chunked_content)
 				counter = counter + 1
-		return UploadResponse(status = 'upload success')
+				log = 'put "{}"'.format(filename_path)
+				logs.append(log)
+		return UploadResponse(status = 'put success', logs = logs)
 	
 	def _chunk(self, content):
 		# HDFS has a block size of 128 MB. Since this is a dummy project, we'll set this to 1 MB for text files (not images)
@@ -44,10 +50,17 @@ class FileSystemServicer(file_system_protocol_pb2_grpc.FileSystemServicer):
 		for i in range(0, len(content), block_size):
 			yield content[i:i+block_size]
 
+	def DownloadFile(self, request, context):
+		"""Unlike UploadFile, DownloadFile is a response-streaming RPC. This means we'll yield on the backend to return"""
+		logs = []
+		# Get each file as an object to return and return the generator
+
+		return DownloadResponse(status = 'get success', logs = logs)  
+
 	def Connect(self, request, context):
 		global _CURRENT_VOLUME
 		_CURRENT_VOLUME = request.volume 
-		return ConnectionResponse(status = 'connection success') 
+		return ConnectionResponse(status = 'connect success') 
 
 def _setup_datanode(count):
 	user = os.path.expanduser("~")

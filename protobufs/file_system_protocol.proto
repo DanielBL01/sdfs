@@ -17,6 +17,7 @@ message UploadRequest {
 
 message UploadResponse {
 	optional string status = 1;
+	repeated string logs = 2;
 }
 
 message DownloadRequest {
@@ -26,6 +27,7 @@ message DownloadRequest {
 // Download response are sent in a stream in the order FileMetaData then File
 message DownloadResponse {
 	optional string status = 1;
+	optional string logs = 2;
 }
 
 message FileMetaData {
